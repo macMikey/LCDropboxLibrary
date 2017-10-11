@@ -4307,7 +4307,7 @@ private command __API pHeader, pPost, pURL, pCallback
       if tError is empty then
          return tRequestID for value
       end if
-   else
+  else #pCallback is empty
       local tOldHeaders, tPostReturn
       put the httpHeaders into tOldHeaders
       set the httpHeaders to pHeader
@@ -4318,10 +4318,11 @@ private command __API pHeader, pPost, pURL, pCallback
       
       if tError is empty then
          return tPostReturn for value
-      end if
-   end if
-   
-   return tError for error
+      else #tError is not empty
+         if tPostReturn is not empty then put CR&tPostReturn after tError
+         return tError for error
+      end if #tError is empty
+   end if #pCallback is not empty
 end __API
 
 on __dropboxAPIAsyncCallback pRequestID, pStatusCode, pBytes, pCurlResultCode
