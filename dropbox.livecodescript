@@ -4306,7 +4306,7 @@ private command __API pHeader, pPost, pURL, pCallback
       
       if tError is empty then
          return tRequestID for value
-      end if
+      end if #tError is empty
   else #pCallback is empty
       local tOldHeaders, tPostReturn
       put the httpHeaders into tOldHeaders
@@ -4315,14 +4315,17 @@ private command __API pHeader, pPost, pURL, pCallback
       put it into tPostReturn
       put the result into tError
       set the httpHeaders to tOldHeaders
-      
+
       if tError is empty then
          return tPostReturn for value
       else #tError is not empty
-         if tPostReturn is not empty then put CR&tPostReturn after tError
-         return tError for error
+         if tPostReturn is not empty then 
+            put CR&tPostReturn after tError
+         end if #tPostReturn is not empty
       end if #tError is empty
    end if #pCallback is not empty
+
+   return tError for error
 end __API
 
 on __dropboxAPIAsyncCallback pRequestID, pStatusCode, pBytes, pCurlResultCode
@@ -4335,7 +4338,7 @@ on __dropboxAPIAsyncCallback pRequestID, pStatusCode, pBytes, pCurlResultCode
    
    tsNetCloseConn pRequestID
 end __dropboxAPIAsyncCallback
-   
+
 private function __GetCaller
    get item 1 to -3 of line -4 of the executionContexts
    if there is not an it then
@@ -5146,9 +5149,9 @@ private function __copy_POST pPathFrom, pPathTo, pAllowSharedFolder, pAutoRename
    {"from_path":"/apps/MyApp/seasons.txt","to_path":"/apps/MyApp/New1/seasons.txt"}
    */
    return __CB(__Q("from_path") & ":" &  __Q(pPathFrom) \
-         & "," &__Q("to_path") & ":" & __Q(pPathTo) \
-         & "," &__Q("allow_shared_folder") & ":" & pAllowSharedFolder \
-         & "," &__Q("autorename") & ":" & pAutoRename)
+      & "," &__Q("to_path") & ":" & __Q(pPathTo) \
+      & "," &__Q("allow_shared_folder") & ":" & pAllowSharedFolder \
+      & "," &__Q("autorename") & ":" & pAutoRename)
 end __copy_POST
 
 private function __move_POST pPathFrom,pPathTo
