@@ -4297,7 +4297,7 @@ private command __API pHeader, pPost, pURL, pCallback
    set socketTimeoutInterval to 30000  --30 seconds
    
    local tError
-   if pCallback is not empty then
+   if pCallback is not empty then #asynchronous call
       local tRequestID
       put uuid() into tRequestID
       put __GetCaller() into sAsyncRequestA[tRequestID]["caller"]
@@ -4307,7 +4307,7 @@ private command __API pHeader, pPost, pURL, pCallback
       if tError is empty then
          return tRequestID for value
       end if #tError is empty
-  else #pCallback is empty
+   else #pCallback is empty
       local tOldHeaders, tPostReturn
       put the httpHeaders into tOldHeaders
       set the httpHeaders to pHeader
@@ -4318,12 +4318,14 @@ private command __API pHeader, pPost, pURL, pCallback
 
       if tError is empty then
          return tPostReturn for value
-      else #tError is not empty
-         if tPostReturn is not empty then 
-            put CR&tPostReturn after tError
-         end if #tPostReturn is not empty
       end if #tError is empty
    end if #pCallback is not empty
+
+
+   #if we get to here, then tError is not empty
+   if tPostReturn is not empty then 
+      put CR&tPostReturn after tError
+   end if #tPostReturn is not empty
 
    return tError for error
 end __API
@@ -4332,10 +4334,10 @@ on __dropboxAPIAsyncCallback pRequestID, pStatusCode, pBytes, pCurlResultCode
    if exists(sAsyncRequestA[pRequestID]["caller"]) then
       local tData, tError
       put tsNetRetrData(pRequestID, tError) into tData
-      
+
       dispatch sAsyncRequestA[pRequestID]["callback"] to sAsyncRequestA[pRequestID]["caller"] with pRequestID, pStatusCode, tData, tError
    end if
-   
+
    tsNetCloseConn pRequestID
 end __dropboxAPIAsyncCallback
 
@@ -4974,7 +4976,7 @@ private function __get_current_account_POST
    /*
    No parameters.
    */
-   return "null"
+   return ""
 end __get_current_account_POST
 
 private function __get_space_usage_POST
