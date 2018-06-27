@@ -1,4 +1,4 @@
-script "com.livecode.script-library.dropbox"
+﻿script "com.livecode.library.dropbox"
 /*
 Copyright (c) 2016 Gerard McCarthy
 The MIT License (MIT)
@@ -19,32 +19,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-on revLoadLibrary
+on extensionInitialize
    if the target is not me then
-      pass revLoadLibrary
+      pass extensionInitialize
    end if
    
    insert the script of me into back
    
    if the environment contains "development" then
       set the _ideoverride of me to true
-      revSBAddAvailableLibrary the short name of me, "Dropbox"
+      local tName
+      put the short name of me into tName
+      revSBAddDependencyForInclusion "extensions", tName, "scriptLibraries", "Internet"
    end if
-end revLoadLibrary
+   
+end extensionInitialize
 
-on revUnloadLibrary
+on extensionFinalize
    if the target is not me then
-      pass revUnloadLibrary
+      pass extensionFinalize
    end if
    
    remove the script of me from back
-end revUnloadLibrary
+end extensionFinalize
 
 /**
+Title: Dropbox Library
+
+Author: LiveCode
+
+Version: 2.0.0
+
+SVGIcon: M402 717L896 1022 554 1307 64 988ZM1388 1272L1388 1380 898 1673 898 1674 897 1673 896 1674 896 1673 407 1380 407 1272 554 1368 896 1084 896 1082 897 1083 898 1082 898 1084 1241 1368ZM554 128L896 413 402 717 64 447ZM1390 717L1728 988 1239 1307 896 1022ZM1239 128L1728 447 1390 717 896 413Z
+
+Description:
 Implements the Dropbox v2 API.
 Doesn't include business pro API.
-
-Version 2.0.0
 */
 
 /**
@@ -4625,8 +4635,8 @@ private function __upload_HEADER pAccessToken,pPath,pMode,pAutorename,pMute
    #--mute Boolean Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If True, this tells the clients that this modification shouldn't result in a user notification. The default for this field is False.
    */
    if pMode is empty then put "add" into pMode
-   if pAutorename is empty then put "False" into pAutorename
-   if pMute is empty then put "False" into pMute
+   if pAutorename is empty then put "false" into pAutorename
+   if pMute is empty then put "false" into pMute
    return __Header_AuthOctet(pAccessToken) & cr & __Header_APIUpload(pPath,pMode,pAutorename,pMute)
 end __upload_HEADER
 
@@ -4976,7 +4986,7 @@ private function __get_current_account_POST
    /*
    No parameters.
    */
-   return ""
+   return "null"
 end __get_current_account_POST
 
 private function __get_space_usage_POST
